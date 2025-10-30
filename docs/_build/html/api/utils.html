@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils &mdash; PyTorchLabFlow 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="experiment" href="experiment.html" />
+    <link rel="prev" title="lab" href="lab.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyTorchLabFlow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/index.html">user guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">📚 API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="context.html">context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab.html">lab</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.Component"><code class="docutils literal notranslate"><span class="pre">Component</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Component.loc"><code class="docutils literal notranslate"><span class="pre">Component.loc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Component.args"><code class="docutils literal notranslate"><span class="pre">Component.args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Component.check_args"><code class="docutils literal notranslate"><span class="pre">Component.check_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Component.setup"><code class="docutils literal notranslate"><span class="pre">Component.setup()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.DataSet"><code class="docutils literal notranslate"><span class="pre">DataSet</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.Db"><code class="docutils literal notranslate"><span class="pre">Db</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Db.close"><code class="docutils literal notranslate"><span class="pre">Db.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Db.execute"><code class="docutils literal notranslate"><span class="pre">Db.execute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.utils.Db.query"><code class="docutils literal notranslate"><span class="pre">Db.query()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.Loss"><code class="docutils literal notranslate"><span class="pre">Loss</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.Metric"><code class="docutils literal notranslate"><span class="pre">Metric</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.Optimizer"><code class="docutils literal notranslate"><span class="pre">Optimizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.extract_all_locs"><code class="docutils literal notranslate"><span class="pre">extract_all_locs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.get_invalid_loc_queries"><code class="docutils literal notranslate"><span class="pre">get_invalid_loc_queries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.hash_args"><code class="docutils literal notranslate"><span class="pre">hash_args()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.utils.load_component"><code class="docutils literal notranslate"><span class="pre">load_component()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="experiment.html">experiment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog/index.html">Change Logs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyTorchLabFlow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">📚 API Reference</a></li>
+      <li class="breadcrumb-item active">utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PTLF.utils">
+<span id="utils"></span><h1>utils<a class="headerlink" href="#module-PTLF.utils" title="Link to this heading"></a></h1>
+<p>This module provides</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.Component">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Component" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for all components with dynamic loading capability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loc</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PTLF.utils.Component.loc">
+<span class="sig-name descname"><span class="pre">loc</span></span><a class="headerlink" href="#PTLF.utils.Component.loc" title="Link to this definition"></a></dt>
+<dd><p>Location identifier for the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PTLF.utils.Component.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#PTLF.utils.Component.args" title="Link to this definition"></a></dt>
+<dd><p>Expected keys for arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.utils.Component.check_args">
+<span class="sig-name descname"><span class="pre">check_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Component.check_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Component.check_args" title="Link to this definition"></a></dt>
+<dd><p>Check whether provided args contain all required keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>dict</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.utils.Component.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Component.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Component.setup" title="Link to this definition"></a></dt>
+<dd><p>Set up the component with provided arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Dictionary of arguments to initialize the component.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized component or setup result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.DataSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DataSet</span></span><a class="reference internal" href="../_modules/PTLF/utils.html#DataSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.DataSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PTLF.utils.Component" title="PTLF.utils.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for PyTorch datasets with dynamic loading support.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.Db">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Db" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Lightweight SQLite wrapper with foreign key enforcement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db_path</strong> (<em>str</em>) – Path to the SQLite database file.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the directory for the DB path doesn’t exist.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.utils.Db.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Db.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Db.close" title="Link to this definition"></a></dt>
+<dd><p>Closes the database connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.utils.Db.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Db.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Db.execute" title="Link to this definition"></a></dt>
+<dd><p>Execute a SQL query (INSERT, UPDATE, DELETE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – SQL query string.</p></li>
+<li><p><strong>params</strong> (<em>tuple</em>) – Query parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sqlite3.Cursor or None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Cursor</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.utils.Db.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#Db.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Db.query" title="Link to this definition"></a></dt>
+<dd><p>Execute a SELECT query and fetch all results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<em>str</em>) – SQL query string.</p></li>
+<li><p><strong>params</strong> (<em>tuple</em>) – Query parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Query results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.Loss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Loss</span></span><a class="reference internal" href="../_modules/PTLF/utils.html#Loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Loss" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PTLF.utils.Component" title="PTLF.utils.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for loss functions.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.Metric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Metric</span></span><a class="reference internal" href="../_modules/PTLF/utils.html#Metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Metric" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PTLF.utils.Component" title="PTLF.utils.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for metrics.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.Model">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Model</span></span><a class="reference internal" href="../_modules/PTLF/utils.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Model" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PTLF.utils.Component" title="PTLF.utils.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for PyTorch models with dynamic loading support.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.utils.Optimizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Optimizer</span></span><a class="reference internal" href="../_modules/PTLF/utils.html#Optimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.Optimizer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#PTLF.utils.Component" title="PTLF.utils.Component"><code class="xref py py-class docutils literal notranslate"><span class="pre">Component</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for optimizers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.utils.extract_all_locs">
+<span class="sig-name descname"><span class="pre">extract_all_locs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#extract_all_locs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.extract_all_locs" title="Link to this definition"></a></dt>
+<dd><p>Recursively extract all ‘loc’ values from nested dictionaries or lists.
+A component is defined as a dict with a ‘loc’ key and optional ‘args’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>Dict</em><em> | </em><em>List</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.utils.get_invalid_loc_queries">
+<span class="sig-name descname"><span class="pre">get_invalid_loc_queries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#get_invalid_loc_queries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.get_invalid_loc_queries" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>Dict</em><em> | </em><em>List</em>)</p></li>
+<li><p><strong>parent_key</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.utils.hash_args">
+<span class="sig-name descname"><span class="pre">hash_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#hash_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.hash_args" title="Link to this definition"></a></dt>
+<dd><p>Generate a SHA-256 hash from a dictionary of arguments.</p>
+<p>This is commonly used to uniquely identify a configuration or set of parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>dict</em>) – The dictionary of arguments to be hashed. Must be JSON-serializable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A SHA-256 hash string representing the input dictionary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – </p></li>
+<li><p><strong>If the dictionary contains non-serializable values.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.utils.load_component">
+<span class="sig-name descname"><span class="pre">load_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/utils.html#load_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.utils.load_component" title="Link to this definition"></a></dt>
+<dd><p>Dynamically load and optionally initialize a component class.</p>
+<p>This utility imports a class from a given module path and instantiates it.
+If the class defines a <cite>setup</cite> method and <cite>setup=True</cite>, it calls <cite>setup(args)</cite>
+and returns the initialized component. Otherwise, it returns the raw instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loc</strong> (<em>str</em>) – Fully qualified class location in dot notation (e.g., ‘CompBase.models.MyModel’).
+If no dot is present, it is assumed the class is defined in <cite>__main__</cite>.</p></li>
+<li><p><strong>args</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary of arguments to pass to the <cite>setup()</cite> method, if applicable.
+Defaults to an empty dict.</p></li>
+<li><p><strong>setup</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to invoke the component’s <cite>setup</cite> method after instantiation. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the loaded class, either raw or configured via <cite>setup()</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ComponentLoadError</strong> – If the specified class is not found in the target module.</p></li>
+<li><p><strong>ImportError</strong> – If the module cannot be imported.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lab.html" class="btn btn-neutral float-left" title="lab" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="experiment.html" class="btn btn-neutral float-right" title="experiment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, BBEK-Anand.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

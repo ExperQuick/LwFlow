@@ -1,0 +1,671 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>experiment &mdash; PyTorchLabFlow 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Change Logs" href="../changelog/index.html" />
+    <link rel="prev" title="utils" href="utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyTorchLabFlow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/index.html">user guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">📚 API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="context.html">context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab.html">lab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">experiment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.PipeLine"><code class="docutils literal notranslate"><span class="pre">PipeLine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.get_path"><code class="docutils literal notranslate"><span class="pre">PipeLine.get_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.is_running"><code class="docutils literal notranslate"><span class="pre">PipeLine.is_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.load"><code class="docutils literal notranslate"><span class="pre">PipeLine.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.load_model"><code class="docutils literal notranslate"><span class="pre">PipeLine.load_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.log"><code class="docutils literal notranslate"><span class="pre">PipeLine.log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.new"><code class="docutils literal notranslate"><span class="pre">PipeLine.new()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.prepare"><code class="docutils literal notranslate"><span class="pre">PipeLine.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.reset"><code class="docutils literal notranslate"><span class="pre">PipeLine.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.should_running"><code class="docutils literal notranslate"><span class="pre">PipeLine.should_running</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.stop_running"><code class="docutils literal notranslate"><span class="pre">PipeLine.stop_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.sync"><code class="docutils literal notranslate"><span class="pre">PipeLine.sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.train"><code class="docutils literal notranslate"><span class="pre">PipeLine.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.update"><code class="docutils literal notranslate"><span class="pre">PipeLine.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PTLF.experiment.PipeLine.verify"><code class="docutils literal notranslate"><span class="pre">PipeLine.verify()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.archive_ppl"><code class="docutils literal notranslate"><span class="pre">archive_ppl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.delete_ppl"><code class="docutils literal notranslate"><span class="pre">delete_ppl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.get_histories"><code class="docutils literal notranslate"><span class="pre">get_histories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.get_ppl_details"><code class="docutils literal notranslate"><span class="pre">get_ppl_details()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.get_ppl_status"><code class="docutils literal notranslate"><span class="pre">get_ppl_status()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.get_ppls"><code class="docutils literal notranslate"><span class="pre">get_ppls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.group_by_common_columns"><code class="docutils literal notranslate"><span class="pre">group_by_common_columns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.multi_train"><code class="docutils literal notranslate"><span class="pre">multi_train()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.plot_metrics"><code class="docutils literal notranslate"><span class="pre">plot_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#PTLF.experiment.transfer_ppl"><code class="docutils literal notranslate"><span class="pre">transfer_ppl()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog/index.html">Change Logs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyTorchLabFlow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">📚 API Reference</a></li>
+      <li class="breadcrumb-item active">experiment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/experiment.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-PTLF.experiment">
+<span id="experiment"></span><h1>experiment<a class="headerlink" href="#module-PTLF.experiment" title="Link to this heading"></a></h1>
+<p>This module  have all  function  for initiating pipeline and training</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PipeLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pplid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>khgkjv</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.get_path">
+<span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">of</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pplid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.get_path" title="Link to this definition"></a></dt>
+<dd><p>Generate a standardized file path for various experiment artifacts.</p>
+<p>Constructs and returns a file path based on the type of file (<cite>of</cite>), experiment ID,
+epoch number, and batch index, where applicable. Automatically creates necessary
+directories if they do not exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>of</strong> (<em>str</em>) – The type of file to retrieve the path for. Supported values:
+- “config”: Configuration file path.
+- “weight”: Model weights file path.
+- “gradient”: Saved gradients file path.
+- “history”: Training history file path.
+- “quick”: Quick config file path.</p></li>
+<li><p><strong>pplid</strong> (<em>str</em><em>, </em><em>optional</em>) – Experiment ID. If not provided, uses the currently set <cite>self.pplid</cite>.</p></li>
+<li><p><strong>epoch</strong> (<em>int</em><em>, </em><em>optional</em>) – Epoch number. Required for weight and gradient file paths.
+For weights, if not specified, the best epoch from config is used.</p></li>
+<li><p><strong>batch</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch index, required for gradient file paths.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Full path to the specified artifact as a string with forward slashes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <cite>pplid</cite> is not set or invalid.
+    If required parameters (<cite>epoch</cite>, <cite>batch</cite>) are missing for gradient paths.
+    If the <cite>of</cite> argument is not one of the supported values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.is_running">
+<span class="sig-name descname"><span class="pre">is_running</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.is_running"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.is_running" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pplid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.load" title="Link to this definition"></a></dt>
+<dd><p>Load the experiment configuration and optionally prepare the pipeline.</p>
+<p>Retrieves the configuration file associated with the given experiment ID and sets
+it as the active configuration. Optionally, prepares the pipeline using the loaded
+settings (e.g., model, data loaders, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pplid</strong> (<em>str</em>) – The experiment ID whose configuration is to be loaded.</p></li>
+<li><p><strong>prepare</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to immediately prepare the pipeline using the loaded configuration.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the provided experiment ID does not exist in the experiment database.</p></li>
+<li><p><strong>Side Effects</strong> – </p></li>
+<li><p><strong>------------</strong> – </p></li>
+<li><p><strong>- Sets self.cnfg with the loaded configuration dictionary.</strong> – </p></li>
+<li><p><strong>- Updates self.pplid to the provided experiment ID.</strong> – </p></li>
+<li><p><strong>- Calls self.prepare</strong><strong>(</strong><strong>) </strong><strong>if prepare is True.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.load_model">
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.load_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.load_model" title="Link to this definition"></a></dt>
+<dd><p>Load model weights from disk into the model component for a specified epoch.</p>
+<p>If <cite>epoch</cite> is set to ‘last’ or ‘best’, the corresponding epoch value from the
+experiment configuration is used. If the epoch is 0 and no weights exist yet,
+the model’s current state is saved before loading. Weights are loaded with
+<cite>strict=False</cite> to allow partial loading of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – The epoch number or keyword (‘last’ or ‘best’) indicating which weights to load.
+- ‘last’: Loads the most recent training checkpoint.
+- ‘best’: Loads the checkpoint with the best validation performance.
+- int: Loads the checkpoint from the specified epoch.
+- None: Defaults to using the current epoch from config if available.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The model component with the loaded weights.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the experiment configuration or weight file path is invalid or missing.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Uses <cite>torch.load(…, weights_only=True)</cite> for loading weights.</p></li>
+<li><p>Uses <cite>strict=False</cite> in <cite>load_state_dict</cite> to allow for minor mismatches.</p></li>
+<li><p>Automatically saves the model if the requested epoch is 0 and no checkpoint exists.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.log" title="Link to this definition"></a></dt>
+<dd><p>in future versions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.new">
+<span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pplid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.new" title="Link to this definition"></a></dt>
+<dd><p>Create a new experiment configuration and initialize its tracking files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pplid</strong> (<em>str</em><em>, </em><em>optional</em>) – Unique experiment identifier. Raises ValueError if it already exists.</p></li>
+<li><p><strong>args</strong> (<em>dict</em><em>, </em><em>optional</em>) – Configuration arguments for the experiment.</p></li>
+<li><p><strong>prepare</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, calls <cite>self.prepare()</cite> after creation. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the experiment ID already exists or if monitor mode is invalid.</p></li>
+<li><p><strong>KeyError</strong> – If ‘metrics’ key is missing from settings.</p></li>
+<li><p><strong>Behavior</strong> – </p></li>
+<li><p><strong>--------</strong> – </p></li>
+<li><p><strong>- Checks if the experiment ID already exists; raises an error if so.</strong> – </p></li>
+<li><p><strong>- Checks if the same configuration already exists using verify.</strong> – </p></li>
+<li><p><strong>- Initializes configuration dictionary with metadata.</strong> – </p></li>
+<li><p><strong>- Saves the configuration.</strong> – </p></li>
+<li><p><strong>- Creates an empty history CSV with columns for training and validation metrics and loss.</strong> – </p></li>
+<li><p><strong>- Initializes quick checkpoint file with default best and last epoch metrics.</strong> – </p></li>
+<li><p><strong>- Appends experiment metadata to the main experiments CSV.</strong> – </p></li>
+<li><p><strong>- Optionally calls self.prepare</strong><strong>(</strong><strong>) </strong><strong>if prepare=True.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.prepare" title="Link to this definition"></a></dt>
+<dd><p>Prepare the experiment by loading model, optimizer, metrics, loss, and data loaders.</p>
+<p>Loads components according to current configuration, initializes data loaders,
+and sets the best metric value based on the stored history and strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If strategy monitor mode is not ‘min’ or ‘max’.</p></li>
+<li><p><strong>Behavior</strong> – </p></li>
+<li><p><strong>--------</strong> – </p></li>
+<li><p><strong>- Loads model and moves it to device.</strong> – </p></li>
+<li><p><strong>- Loads optimizer with model parameters.</strong> – </p></li>
+<li><p><strong>- Loads metrics and loss functions to device.</strong> – </p></li>
+<li><p><strong>- Creates training and validation data loaders.</strong> – </p></li>
+<li><p><strong>- Loads last saved model weights.</strong> – </p></li>
+<li><p><strong>- Initializes the best metric value from saved checkpoints</strong><strong> or </strong><strong>sets default.</strong> – </p></li>
+<li><p><strong>- Sets internal flag _prepared to True on success.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.reset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.should_running">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">should_running</span></span><a class="headerlink" href="#PTLF.experiment.PipeLine.should_running" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.stop_running">
+<span class="sig-name descname"><span class="pre">stop_running</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.stop_running"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.stop_running" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.sync">
+<span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.sync" title="Link to this definition"></a></dt>
+<dd><p>Synchronize and update the experiment configuration with the latest quick settings.</p>
+<p>Loads the quick configuration file associated with the current experiment ID,
+updates the main configuration (<cite>self.cnfg</cite>) with its contents, and then saves
+the updated configuration to disk.</p>
+<section id="side-effects">
+<h2>Side Effects<a class="headerlink" href="#side-effects" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Modifies the <cite>self.cnfg</cite> attribute by merging it with the quick configuration.</p></li>
+<li><p>Writes the updated configuration to the config file.</p></li>
+<li><p>Prints a success message indicating the experiment has been synced.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">raises ValueError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If the current arguments do not match the original configuration, preventing saving.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_patience</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.train" title="Link to this definition"></a></dt>
+<dd><p>Train the model for a specified number of epochs with optional early stopping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_epochs</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of epochs to train. Default is 5.</p></li>
+<li><p><strong>self_patience</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of epochs to wait for improvement before early stopping. If None, equals num_epochs.</p></li>
+<li><p><strong>verbose</strong> (<em>list</em><em> of </em><em>str</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Metrics to display live during training. Must be from the set of defined metrics.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Uses early stopping based on the configured strategy and patience.</p></li>
+<li><p>Automatically resumes from last epoch.</p></li>
+<li><p>Saves best model weights and updates training history.</p></li>
+<li><p>Avoids re-entrance if training is already running.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.update" title="Link to this definition"></a></dt>
+<dd><p>Update the pipeline configuration and save state after an epoch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em>) – Dictionary containing keys such as ‘epoch’, ‘train_accuracy’, ‘train_loss’,
+‘val_accuracy’, ‘val_loss’, and potentially other metrics and durations.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns True if the current epoch’s validation metric improves over the best recorded,
+triggering a best model save; otherwise, False.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Saves model weights after every epoch.</p></li>
+<li><p>Appends training and validation metrics to the history CSV.</p></li>
+<li><p>Updates the quick checkpoint file with last and best metrics.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PTLF.experiment.PipeLine.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pplid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/_pipeline.html#PipeLine.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.PipeLine.verify" title="Link to this definition"></a></dt>
+<dd><p>Check whether a given experiment ID exists in the experiment database.</p>
+<p>Queries the experiments table to verify whether the specified experiment ID is recorded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pplid</strong> (<em>str</em>) – The experiment ID to check.</p></li>
+<li><p><strong>args</strong> (<em>Dict</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns the <cite>pplid</cite> if it exists in the database, otherwise returns <cite>False</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[str, bool]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;exp_001&quot;</span><span class="p">)</span>
+<span class="go">&#39;exp_001&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="s2">&quot;nonexistent_exp&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.archive_ppl">
+<span class="sig-name descname"><span class="pre">archive_ppl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#archive_ppl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.archive_ppl" title="Link to this definition"></a></dt>
+<dd><p>Archive or unarchive pipelines by moving their related files
+between active and archived folders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ppls</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.delete_ppl">
+<span class="sig-name descname"><span class="pre">delete_ppl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#delete_ppl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.delete_ppl" title="Link to this definition"></a></dt>
+<dd><p>Permanently delete archived pipelines, including config files,
+logging files, and database records.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ppls</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – List of pipeline IDs to delete from archive.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.get_histories">
+<span class="sig-name descname"><span class="pre">get_histories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#get_histories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.get_histories" title="Link to this definition"></a></dt>
+<dd><p>Retrieve training and validation histories for specified pipelines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>list</strong><strong>[</strong><strong>str</strong><strong>]</strong> (<em>metrics</em>) – Defaults to all pipelines.</p></li>
+<li><p><strong>optional</strong><strong>)</strong> (<em>List</em><em> of </em><em>metric names to include from histories.</em>) – Defaults to all pipelines.</p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>[</strong><strong>str</strong><strong>]</strong> – Defaults to all available train and val metrics plus losses.</p></li>
+<li><p><strong>optional</strong><strong>)</strong> – Defaults to all available train and val metrics plus losses.</p></li>
+<li><p><strong>ppls</strong> (<em>List</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any pipeline ID or metric name is invalid.:</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dict[str, pd.DataFrame]</strong> – epoch and selected metrics history.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping pipeline IDs to DataFrames containing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.get_ppl_details">
+<span class="sig-name descname"><span class="pre">get_ppl_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#get_ppl_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.get_ppl_details" title="Link to this definition"></a></dt>
+<dd><p>Retrieve detailed information for a list of pipelines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ppls</strong> (<em>list</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – List of pipeline IDs to fetch details for.
+If None, fetches details for all pipelines.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing details for each pipeline, including model,
+dataset, metrics, loss, and optimizer locations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.get_ppl_status">
+<span class="sig-name descname"><span class="pre">get_ppl_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#get_ppl_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.get_ppl_status" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the best and latest status metrics for specified pipelines or all if none specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ppls</strong> (<em>list</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – List of pipeline IDs to fetch status for. If None, status for all pipelines is returned.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing pipeline IDs, best epoch, train/validation metrics,
+losses, and last epoch.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.get_ppls">
+<span class="sig-name descname"><span class="pre">get_ppls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#get_ppls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.get_ppls" title="Link to this definition"></a></dt>
+<dd><p>Retrieves a list of all pipeline IDs from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list containing all pipeline IDs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.group_by_common_columns">
+<span class="sig-name descname"><span class="pre">group_by_common_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#group_by_common_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.group_by_common_columns" title="Link to this definition"></a></dt>
+<dd><p>Group pipeline records by their common set of DataFrame columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>dict</strong><strong>)</strong> (<em>records</em>) – (e.g., training histories with various metrics).</p></li>
+<li><p><strong>records</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>DataFrame</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong> – pipeline IDs sharing that column structure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary mapping each unique set of column names (as a <cite>frozenset</cite>) to a list of</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">records</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;exp1&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="s2">&quot;val_loss&quot;</span><span class="p">]),</span>
+<span class="gp">... </span>    <span class="s2">&quot;exp2&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="s2">&quot;val_loss&quot;</span><span class="p">]),</span>
+<span class="gp">... </span>    <span class="s2">&quot;exp3&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;val_accuracy&quot;</span><span class="p">])</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group_by_common_columns</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+<span class="go">{</span>
+<span class="go">    frozenset({&#39;epoch&#39;, &#39;train_loss&#39;, &#39;val_loss&#39;}): [&#39;exp1&#39;, &#39;exp2&#39;],</span>
+<span class="go">    frozenset({&#39;epoch&#39;, &#39;accuracy&#39;, &#39;val_accuracy&#39;}): [&#39;exp3&#39;]</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.multi_train">
+<span class="sig-name descname"><span class="pre">multi_train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patience</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#multi_train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.multi_train" title="Link to this definition"></a></dt>
+<dd><p>Train multiple pipelines up to a maximum number of epochs with optional patience.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ppls</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) – Dictionary of pipeline IDs to some integer values (usage unclear).</p></li>
+<li><p><strong>last_epoch</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of epochs to train each pipeline, by default 10.</p></li>
+<li><p><strong>patience</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of epochs to wait for improvement before stopping (currently unused), by default 5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any pipeline ID in <cite>ppls</cite> is not found in the existing pipelines.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.plot_metrics">
+<span class="sig-name descname"><span class="pre">plot_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#plot_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.plot_metrics" title="Link to this definition"></a></dt>
+<dd><p>Plot specified metrics for one or more pipelines over training epochs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ppls</strong> (<em>list</em><em> of </em><em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – List of pipeline IDs to plot. If None, plots all pipelines.</p></li>
+<li><p><strong>metrics</strong> (<em>list</em><em> of </em><em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – List of metrics to plot. If None, plots all available metrics in the histories.</p></li>
+<li><p><strong>args</strong> (<em>Dict</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping metric names to their corresponding matplotlib Axes objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any pipeline ID in <cite>ppls</cite> is invalid.
+    If any metric in <cite>metrics</cite> is invalid.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function groups pipelines by common metric columns and plots each metric
+across all pipelines sharing that metric. The returned Axes can be further customized.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PTLF.experiment.transfer_ppl">
+<span class="sig-name descname"><span class="pre">transfer_ppl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'export'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'copy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/PTLF/experiment.html#transfer_ppl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PTLF.experiment.transfer_ppl" title="Link to this definition"></a></dt>
+<dd><p>Transfers pipeline data between main storage and transfer folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>list</strong><strong>[</strong><strong>str</strong><strong>]</strong><strong>)</strong> (<em>ppls</em>)</p></li>
+<li><p><strong>(</strong><strong>str</strong> (<em>mode</em>) – ‘export’ moves data from main storage to transfer folder,
+‘import’ moves data from transfer folder back to main storage.</p></li>
+<li><p><strong>optional</strong><strong>)</strong> (<em>Transfer mode</em><em>, </em><em>either 'copy'</em><em> (</em><em>default</em><em>) or </em><em>'move'.</em>) – ‘export’ moves data from main storage to transfer folder,
+‘import’ moves data from transfer folder back to main storage.</p></li>
+<li><p><strong>(</strong><strong>str</strong> – ‘copy’ duplicates files, ‘move’ relocates files.</p></li>
+<li><p><strong>optional</strong><strong>)</strong> – ‘copy’ duplicates files, ‘move’ relocates files.</p></li>
+<li><p><strong>ppls</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>transfer_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>mode</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <cite>transfer_type</cite> or <cite>mode</cite> is invalid,: or if any pipeline ID is not found in the source records.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="utils.html" class="btn btn-neutral float-left" title="utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../changelog/index.html" class="btn btn-neutral float-right" title="Change Logs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, BBEK-Anand.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; PyTorchLabFlow 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Workflows" href="workflow.html" />
+    <link rel="prev" title="user guide" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyTorchLabFlow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">user guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#component">Component</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#key-features">Key Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core-base-class-component">Core Base Class: <code class="docutils literal notranslate"><span class="pre">Component</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#specialized-component-types">Specialized Component Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-defining-a-custom-model">Example: Defining a Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nesting-components-example">Nesting Components Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pipeline">Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html">Templates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">📚 API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog/index.html">Change Logs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyTorchLabFlow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">user guide</a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/concepts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>PyTorchLabFlow is a modular deep learning framework designed for building flexible, reusable, and composable deep learning pipelines.</p>
+<p>In PyTorchLabFlow, <strong>everything is a Component</strong>—from models and datasets to losses, optimizers, and custom blocks. This modular design enables users to configure, nest, and reuse components dynamically, simplifying the construction and maintenance of complex deep learning workflows.</p>
+<section id="component">
+<h2>Component<a class="headerlink" href="#component" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>A <strong>Component</strong> is a reusable, self-contained code block that can represent a model, dataset, optimizer, loss function, or any processing step.</p></li>
+<li><p>Each Component is identified by:
+- <code class="docutils literal notranslate"><span class="pre">loc</span></code>: a string specifying the Python import path of the component class.
+- <code class="docutils literal notranslate"><span class="pre">args</span></code>: a dictionary containing parameters to configure or initialize the component.</p></li>
+<li><p>Components support <strong>infinite nesting</strong>, allowing other components to be passed as parameters inside <code class="docutils literal notranslate"><span class="pre">args</span></code>.</p></li>
+</ul>
+<section id="key-features">
+<h3>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Dynamic Loading</strong>: Components are loaded at runtime using the <code class="docutils literal notranslate"><span class="pre">loc</span></code> string and initialized with <code class="docutils literal notranslate"><span class="pre">args</span></code>.</p></li>
+<li><p><strong>Argument Validation</strong>: Each component declares required arguments which are validated during setup.</p></li>
+<li><p><strong>Deep Nesting</strong>: Components can include other components inside their <code class="docutils literal notranslate"><span class="pre">args</span></code> dictionary for flexible pipeline composition.</p></li>
+</ul>
+</section>
+<section id="core-base-class-component">
+<h3>Core Base Class: <code class="docutils literal notranslate"><span class="pre">Component</span></code><a class="headerlink" href="#core-base-class-component" title="Link to this heading"></a></h3>
+<p>The abstract <code class="docutils literal notranslate"><span class="pre">Component</span></code> class provides core setup logic:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">check_args(args:</span> <span class="pre">dict)</span></code>: Checks if all required arguments are provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup(args:</span> <span class="pre">dict)</span></code>: Validates arguments and calls the subclass’s <code class="docutils literal notranslate"><span class="pre">_setup()</span></code> method to build the component.</p></li>
+</ul>
+</section>
+<section id="specialized-component-types">
+<h3>Specialized Component Types<a class="headerlink" href="#specialized-component-types" title="Link to this heading"></a></h3>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Component Overview</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Class</p></th>
+<th class="head"><p>Inherits From</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Model</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Model</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Component</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Dataset</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DataSet</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Component</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Loss</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Loss</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Component</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Optimizer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Optimizer</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Component</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Metric</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Metric</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Component</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><strong>DataSet</strong>: feeds  data to model from files, you can fuse processing steps inside it.</p></li>
+<li><p><strong>Model</strong>: conventional <cite>torch.nn.Module</cite>  but  <cite>PyTorchLabFlow</cite>’s  wrapper,</p></li>
+<li><p><strong>Metric</strong>: your megtric functions otherthan loss</p></li>
+<li><p><strong>Loss</strong>: the loss function, grad calculation</p></li>
+<li><p><strong>Optimizer</strong>: your optimizer</p></li>
+</ul>
+</section>
+<section id="example-defining-a-custom-model">
+<h3>Example: Defining a Custom Model<a class="headerlink" href="#example-defining-a-custom-model" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;input_dim&quot;</span><span class="p">,</span> <span class="s2">&quot;output_dim&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;input_dim&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;output_dim&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</pre></div>
+</div>
+</section>
+<section id="nesting-components-example">
+<h3>Nesting Components Example<a class="headerlink" href="#nesting-components-example" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;my_project.models.TransformerClassifier&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;backbone&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;my_project.models.TransformerEncoder&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+                <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="mi">6</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;num_classes&quot;</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pipeline">
+<h2>Pipeline<a class="headerlink" href="#pipeline" title="Link to this heading"></a></h2>
+<p>A Pipeline orchestrates and manages all components of a machine learning experiment. It serializes the experiment’s configuration, including the model, dataset, and hyperparameters, into a unique, identifiable setup. Each pipeline instance, identified by a unique expid, ensures that experiments are reproducible and their configurations are unique.</p>
+<p>To initialize a new experiment from scratch, you can use the new() method.</p>
+<p>Alternatively, if you wish to create a new experiment based on a previous one, perhaps to fine-tune a model or slightly alter hyperparameters, you can use the use() method. This inherits the configuration from an existing experiment, allowing you to apply specific changes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new pipeline based on an existing one</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">PipeLine</span><span class="p">()</span>
+<span class="n">P</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">use_exp</span><span class="o">=</span><span class="s1">&#39;my_first_experiment&#39;</span><span class="p">,</span> <span class="n">expid</span><span class="o">=</span><span class="s1">&#39;fine_tuned_experiment&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">new_args</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="user guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workflow.html" class="btn btn-neutral float-right" title="Workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, BBEK-Anand.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
