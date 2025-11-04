@@ -298,6 +298,8 @@ class PipeLine:
             self.workflow.new(args['args'])
         except:
             traceback.print_exc()
+            
+            raise
         
         self.__db.execute(
             "INSERT INTO ppls (pplid, args_hash) VALUES (?, ?)",

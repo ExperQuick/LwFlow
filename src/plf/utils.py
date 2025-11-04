@@ -146,8 +146,10 @@ class Component(ABC):
                 raise AttributeError(
                     f"Component '{self.loc}' does not implement '_setup'"
                 ) from exc
-        # raise ValueError(f"Arguments {args} are incompatible with '{self.loc}'")
+        
         traceback.print_exc()
+        raise ValueError(f"Arguments {args} are incompatible with '{self.loc}'")
+        
     
     @abstractmethod
     def _setup(self, args: Dict[str, Any],P=None) -> Optional[Any]:
