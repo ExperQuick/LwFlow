@@ -232,7 +232,7 @@ class WorkFlow(Component, ABC):
     """
 
     @abstractmethod
-    def prepare(self, *args, **kwargs):
+    def prepare(self):
         """
         Called when PipeLine.prepare() is executed.
         Convert necessary components from the configuration dictionary
@@ -240,14 +240,14 @@ class WorkFlow(Component, ABC):
         """
 
     @abstractmethod
-    def run(self, *args, **kwargs):
+    def run(self):
         """
         Called when PipeLine.run() is executed.
         Implement the main computation or processing logic here.
         """
 
     @abstractmethod
-    def new(self, name: str, **kwargs):
+    def new(self, args):
         """
         Initialize a new workflow instance with the given name and arguments.
         """
@@ -261,14 +261,14 @@ class WorkFlow(Component, ABC):
         """
 
 
-    def clean(self, *args, **kwargs):
+    def clean(self):
         """
         Clean up temporary files, cached outputs, or intermediate artifacts.
         """
         pass
 
 
-    def status(self, *args, **kwargs) -> str:
+    def status(self) -> str:
         """
         Return the current status or progress of the workflow.
         """
