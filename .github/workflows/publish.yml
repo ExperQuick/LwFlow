@@ -1,10 +1,9 @@
-name: Publish to PyPI / TestPyPI
+name: Publish to PyPI 
 
 on:
   push:
     branches:
       - main
-      - dev
 
 jobs:
   build:
@@ -22,25 +21,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install build
 
-      # Bump version for main (PyPI)
-      - name: Bump patch version for PyPI
-        if: github.ref == 'refs/heads/main'
-        run: python scripts/bump_version.py
-
-      # Set dev version for TestPyPI
-      - name: Set dev version for TestPyPI
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          BASE_VERSION=$(grep -oP "__version__ = '\K[^']+" src/PTLF/_version.py)
-          DATE=$(date +%Y%m%d%H%M%S%N)
-          GIT_HASH=$(git rev-parse --short HEAD)
-          DEV_VERSION="${BASE_VERSION}.dev${DATE}"
-          echo "__version__ = '${DEV_VERSION}'" > src/PTLF/_version.py
-          echo "✅ Set dev version: $DEV_VERSION"
-
-      # Show current version file for debugging
-      - name: Show current version
-        run: cat src/PTLF/_version.py
 
       # Clean old builds before build
       - name: Clean old builds
@@ -77,12 +57,7 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
-          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            echo "🚀 Publishing to PyPI"
-            twine upload --verbose -u __token__ -p "$PYPI_TOKEN" dist/*
-          elif [ "${GITHUB_REF}" = "refs/heads/dev" ]; then
-            echo "🧪 Publishing to TestPyPI"
-            twine upload --verbose --repository-url https://test.pypi.org/legacy/ -u __token__ -p "$TEST_PYPI_TOKEN" dist/*
-          fi
+          echo "🚀 Publishing to PyPI"
+          twine upload --verbose -u __token__ -p "$PYPI_TOKEN" dist/*
+          
