@@ -16,8 +16,7 @@ Quick Start
 
 3. **Download the example project**
 
-   Download from: 
-   `https://github.com/ExperQuick/PLF_DL_SetUps/tree/main/Basic`  
+   Download from: `<https://github.com/ExperQuick/PLF_DL_SetUps/tree/main/Basic>`_
    and place it in a folder of your choice.
 
 4. **Launch Jupyter Notebook**
