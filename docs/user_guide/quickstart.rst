@@ -30,7 +30,7 @@ Quick Start
 
 5. **Open the project in your browser**
 
-   Navigate to the folder where you saved the downloaded project.
+   Navigate to the folder where you extracted the downloaded project.
 
 6. **Follow the instructions sequentially**
 
