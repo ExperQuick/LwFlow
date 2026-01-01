@@ -393,58 +393,72 @@ def _import_on_remote(zip_path, meta, mode="copy"):
 def _loc_hash(code: str) -> str:
     return hashlib.sha1(code.encode()).hexdigest()[:8]
 
-# ---------------------------
-# Helper: write single .py file for locs (fixed)
-# ---------------------------
 def _write_loc_payload(zf, lab_base: Path, locs: set, transfer_id: str):
     """
     Collect all component classes defined in locs and their imports,
     write them into a single <transfer_id>.py file inside the zip,
     and return mapping of full loc -> transfer_id.classhash
     """
-    import ast
-
     loc_map = {}
     code_chunks = []
-
+    processed_modules = set()
+    settings = get_shared_data()
+    component_dir = Path(settings["component_dir"]).resolve()
     for loc in sorted(locs):
         if '.' not in loc:
             continue
         module_name, class_name = loc.rsplit('.', 1)
-        module_path = lab_base / "components" / f"{module_name}.py"
+
+        module_path = component_dir / f"{module_name}.py"
         if not module_path.exists():
             print(f"Warning: component file not found: {module_path}")
             continue
 
+        # Skip module if already processed
+        if module_path in processed_modules:
+            continue
+        processed_modules.add(module_path)
+
         code_text = module_path.read_text(encoding='utf-8')
 
-        # Parse AST
-        tree = ast.parse(code_text)
-
-        # --- Collect imports ---
+        # Extract imports (lines starting with import or from)
         imports = []
-        classes = []
-        for node in tree.body:
-            if isinstance(node, (ast.Import, ast.ImportFrom)):
-                imports.append(ast.get_source_segment(code_text, node))
-            elif isinstance(node, ast.ClassDef) and node.name == class_name:
-                classes.append(ast.get_source_segment(code_text, node))
+        classes = {}
+        for line in code_text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("import ") or stripped.startswith("from "):
+                imports.append(line)
 
-        if not classes:
+        # Extract class definitions (simple regex for top-level classes)
+        import re
+        class_pattern = re.compile(r"^class\s+(\w+)[\(:]", re.MULTILINE)
+        for match in class_pattern.finditer(code_text):
+            cls_name = match.group(1)
+            # get class source by splitting lines
+            lines = code_text.splitlines()
+            start = match.start()
+            # crude: take all lines from match to end or next class
+            next_class_match = class_pattern.search(code_text, pos=match.end())
+            end = next_class_match.start() if next_class_match else len(code_text)
+            class_code = code_text[match.start():end].strip()
+            classes[cls_name] = class_code
+
+        # pick only classes referenced in locs from this module
+        if class_name not in classes:
+            print(f"Warning: class {class_name} not found in {module_path}")
             continue
 
-        # Join imports + class definition
-        final_code = '\n'.join(imports + [''] + classes)
+        # include imports + class code
+        final_code = '\n'.join(imports + [''] + [classes[class_name]])
         class_hash = hashlib.sha1(final_code.encode()).hexdigest()[:8]
-
         loc_map[loc] = f"{transfer_id}.{class_hash}"
         code_chunks.append(f"# --- {loc} ---\n{final_code}\n")
 
-    # Write all to single file inside zip
+    # Write single .py inside zip
     py_name = f"{transfer_id}.py"
     zf.writestr(py_name, '\n\n'.join(code_chunks))
-
     return loc_map
+
 
 # ---------------------------
 # Internal: import on base
