@@ -14,10 +14,9 @@ from .utils import (
     hash_args,
     get_invalid_loc_queries,
     Db,
-    Component,
-)
+    Component)
+from ._transfer_utils import TransferContext, _load_transfer_config
 from .context import get_shared_data
-
 
 class CompsDict(TypedDict):
     """
@@ -137,42 +136,56 @@ class PipeLine:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         return path
 
-    def load(self, pplid: str, prepare: bool = False) -> None:
-        """
-        Load the experiment configuration and optionally prepare the pipeline.
-
-        Retrieves the configuration file associated with the given experiment ID and sets
-        it as the active configuration. Optionally, prepares the pipeline using the loaded
-        settings (e.g., model, data loaders, etc.).
-
-        Parameters
-        ----------
-        pplid : str
-            The experiment ID whose configuration is to be loaded.
-        prepare : bool, optional
-            Whether to immediately prepare the pipeline using the loaded configuration.
-            Defaults to False.
-
-        Raises
-        ------
-        ValueError
-            If the provided experiment ID does not exist in the experiment database.
-
-        Side Effects
-        ------------
-        - Sets `self.cnfg` with the loaded configuration dictionary.
-        - Updates `self.pplid` to the provided experiment ID.
-        - Calls `self.prepare()` if `prepare` is True.
-        """
+    def load(self, pplid: str, prepare: bool = False):
+        """Load a pipeline configuration from disk"""
         self.reset()
+
         if not self.verify(pplid=pplid):
-            raise ValueError(f"The pplid: {pplid} is not exists")
-        with open(self.get_path(of="config", pplid=pplid), encoding="utf-8") as cnfg:
-            cnfg = json.load(cnfg)
-        self.cnfg = cnfg
+            raise ValueError(f"The pplid: {pplid} does not exist")
+
+        cfg_path = self.get_path(of="config", pplid=pplid)
+        with open(cfg_path, encoding="utf-8") as f:
+            self.cnfg = json.load(f)
         self.pplid = pplid
+
+        # ----------------------------
+        # Automatic remote adjustment
+        # ----------------------------
+        if self.settings.get("lab_role") == "remote":
+            print(33333)
+            ctx: "TransferContext" = self.settings.get("transfer_context")
+            if ctx:
+                print(999999)
+                self._apply_remote_paths(ctx)
+
         if prepare:
             self.prepare()
+
+    def _apply_remote_paths(self, ctx: "TransferContext"):
+        """
+        Adjust all locs and paths using TransferContext for remote lab.
+        Only modifies self.cnfg in memory; never writes to disk.
+        """
+        def remap(d):
+            if isinstance(d, dict):
+                for k, v in d.items():
+                    if k == "loc" and isinstance(v, str):
+                        # Map LOC via transfer context
+                        d[k] = ctx.map_component(v, pplid=self.pplid)
+                    elif k in ("src", "path", "data_path") and isinstance(v, str):
+                        # Map file paths via transfer context
+                        d[k] = ctx.map_path(v)
+                    else:
+                        remap(v)
+            elif isinstance(d, list):
+                for item in d:
+                    remap(item)
+
+        remap(self.cnfg)
+
+        # Force re-prepare
+        self._prepared = False
+
 
     def reset(self):
         """
@@ -426,3 +439,6 @@ class PipeLine:
             return self.workflow.status()
         except:
             traceback.print_exc()
+
+from copy import deepcopy
+

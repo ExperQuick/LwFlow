@@ -1,5 +1,5 @@
 """
-create or use uor lab
+create or use our lab
 """
 from pathlib import Path
 import os
@@ -234,25 +234,7 @@ def init_clone(
     data_path: str,
     component_dir: str,
 ):
-    """
-    Initialize a REMOTE lab from a clone configuration.
-
-    This is executed on a DIFFERENT SYSTEM (remote machine).
-
-    Parameters
-    ----------
-    clone_config : dict
-        The clone.json content copied from BASE lab.
-    data_path : str
-        Base directory where remote lab data should live.
-    component_dir : str
-        Directory where transferred / local components (code) live.
-
-    Returns
-    -------
-    dict
-        Initialized lab settings
-    """
+    
     clone_id = clone_config["clone_id"]
 
     # Absolute paths

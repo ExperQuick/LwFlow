@@ -23,27 +23,22 @@ def _ensure_remote(settings):
     if settings.get("lab_role") != "remote":
         raise RuntimeError("Operation allowed only in REMOTE lab")
 
-# ---------------------------
-# TransferContext
-# ---------------------------
-class TransferContext:
-    """Runtime context for remapping paths and components on remote."""
-    def __init__(self, path_map=None, component_map=None, transfer_id=None):
-        self.path_map = {Path(k).as_posix(): Path(v).as_posix() for k, v in (path_map or {}).items()}
-        self.component_map = component_map or {}
-        self.transfer_id = transfer_id
 
-    def map_path(self, path: str) -> str:
-        path = Path(path).as_posix()
-        for src, dst in self.path_map.items():
-            if path.startswith(src):
-                return path.replace(src, dst, 1)
-        return path
+def _save_transfer_config(transfers_dir: Path, cfg: dict):
+    cfg_path = transfers_dir / "transfer_config.json"
+    cfg_path.write_text(json.dumps(cfg, indent=4), encoding="utf-8")
 
-    def map_component(self, loc: str) -> str:
-        return self.component_map.get(loc, loc)
 
-# ---------------------------
+def _load_transfer_config(transfers_dir: Path):
+    cfg_path = transfers_dir / "transfer_config.json"
+    if not cfg_path.exists():
+        return {
+            "active_transfer_id": None,
+            "history": [],
+            "ppl_to_transfer": {}
+        }
+    return json.loads(cfg_path.read_text(encoding="utf-8"))
+#---------------------
 # Safe ZIP extraction
 # ---------------------------
 def _safe_extract(zip_path: Path, target_dir: Path):
@@ -139,11 +134,7 @@ def collect_transfer_meta(ppls):
         paths, locs = extract_paths_and_locs(config)
         all_paths.update(paths)
         all_locs.update(locs)
-
-    return {
-        "srcs": sorted(all_paths),
-        "locs": sorted(all_locs),
-    }
+    return  sorted(all_paths), sorted(all_locs)
 
 
 def _payload_name(src: str) -> str:
@@ -192,12 +183,12 @@ def _export_base_to_remote(ppls, clone_id, transfer_type, mode="copy"):
     zip_path = clone_dir / "transfers" / f"{transfer_id}.zip"
     zip_path.parent.mkdir(parents=True, exist_ok=True)
     paths, locs = collect_transfer_meta(ppls)
-    
+
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         path_map = _write_payload(zf, lab_base, paths)
         # ---- LOCS: single .py file ----
-        loc_map = _write_loc_payload(zf, lab_base, locs, transfer_id)
+        loc_map = _write_loc_payload(zf, locs, transfer_id)
 
         transfer_meta = {
             "transfer_id": transfer_id,
@@ -273,6 +264,47 @@ def _export_base_to_remote(ppls, clone_id, transfer_type, mode="copy"):
                         p.unlink()
 
     return zip_path
+# ---------------------------
+# Helper: check conflicts
+# ---------------------------
+def _check_conflicting_ppls(ppls_meta: dict):
+    """
+    Check if any pplid in ppls_meta already exists in remote DB.
+    Raise RuntimeError if conflict detected.
+    """
+    settings = get_shared_data()
+    db = Db(db_path=str(Path(settings["data_path"]) / "ppls.db"))
+
+    existing = {row[0] for row in db.query("SELECT pplid FROM ppls")}
+    db.close()
+
+    conflicts = [pplid for pplid in ppls_meta if pplid in existing]
+    if conflicts:
+        raise RuntimeError(f"Conflicting pplids exist in remote: {conflicts}")
+
+# ---------------------------
+# Helper: clean conflicting ppls
+# ---------------------------
+def clean_conflicting_ppls(ppls_meta: dict):
+    """
+    Delete pplid entries from remote DB and remove their transfer folders.
+    """
+    settings = get_shared_data()
+    lab_base = Path(settings["data_path"])
+    transfers_dir = lab_base / "Transfers"
+
+    db = Db(db_path=str(lab_base / "ppls.db"))
+
+    for pplid in ppls_meta:
+        # Remove from DB
+        db.execute("DELETE FROM ppls WHERE pplid=?", (pplid,))
+        
+        # Remove associated transfer folder(s)
+        for folder in transfers_dir.glob(f"*{pplid}*"):
+            if folder.is_dir():
+                shutil.rmtree(folder)
+    
+    db.close()
 
 # ---------------------------
 # Internal: REMOTE -> BASE (results only)
@@ -332,141 +364,234 @@ def _export_remote_to_base(ppls, prev_transfer_id=None, mode="copy"):
 # ---------------------------
 # Internal: import on remote
 # ---------------------------
-def _import_on_remote(zip_path, meta, mode="copy"):
+def _import_on_remote(zip_path: Path, meta: dict, mode="copy", allow_overwrite=False):
     settings = get_shared_data()
+    _ensure_remote(settings)
+
     lab_base = Path(settings["data_path"]).resolve()
+    component_dir = Path(settings["component_dir"]).resolve()
 
     transfers_dir = lab_base / "Transfers"
     transfers_dir.mkdir(exist_ok=True)
 
-    # ---- Stage extraction ----
-    extract_dir = transfers_dir / meta["transfer_id"]
-    extract_dir.mkdir(parents=True, exist_ok=True)
+    transfer_id = meta["transfer_id"]
+    ppls_meta = meta.get("ppls", {})
+    incoming_ppls = set(ppls_meta.keys())
 
-    _safe_extract(zip_path, extract_dir)
+    # --------------------------------------------------
+    # Load / init transfer_config.json
+    # --------------------------------------------------
+    def _load_cfg():
+        cfg_path = transfers_dir / "transfer_config.json"
+        if not cfg_path.exists():
+            return {
+                "active_transfer_id": None,
+                "history": [],
+                "ppl_to_transfer": {}
+            }
+        return json.loads(cfg_path.read_text(encoding="utf-8"))
 
-    # ---- Materialize into lab ----
-    for item in extract_dir.rglob("*"):
-        if item.is_dir():
-            continue
+    def _save_cfg(cfg):
+        cfg_path = transfers_dir / "transfer_config.json"
+        cfg_path.write_text(json.dumps(cfg, indent=4), encoding="utf-8")
 
-        # transfer.json stays in Transfers
-        if item.name == "transfer.json":
-            continue
+    cfg = _load_transfer_config(transfers_dir)
 
-        rel_path = item.relative_to(extract_dir)
-        target = lab_base / rel_path
-        target.parent.mkdir(parents=True, exist_ok=True)
+    ppl_to_transfer = cfg.setdefault("ppl_to_transfer", {})
+
+    # --------------------------------------------------
+    # Enforce: one pplid → one transfer
+    # --------------------------------------------------
+    for pplid in incoming_ppls:
+        if pplid in ppl_to_transfer:
+            existing_tid = ppl_to_transfer[pplid]
+            if existing_tid != transfer_id:
+                if not allow_overwrite:
+                    raise RuntimeError(
+                        f"pplid '{pplid}' already belongs to transfer '{existing_tid}'"
+                    )
+
+    # --------------------------------------------------
+    # DB conflict handling
+    # --------------------------------------------------
+    if not allow_overwrite:
+        _check_conflicting_ppls(ppls_meta)
+    else:
+        clean_conflicting_ppls(ppls_meta)
+
+    # --------------------------------------------------
+    # Extract ZIP into Transfers/<transfer_id>
+    # --------------------------------------------------
+    transfer_dir = transfers_dir / transfer_id
+    transfer_dir.mkdir(parents=True, exist_ok=True)
+
+    _safe_extract(zip_path, transfer_dir)
+
+    # --------------------------------------------------
+    # Move generated LOC .py file into component_dir
+    # --------------------------------------------------
+    loc_py = transfer_dir / f"{transfer_id}.py"
+    if loc_py.exists():
+        component_dir.mkdir(parents=True, exist_ok=True)
+        target = component_dir / loc_py.name
 
         if target.exists():
             target.unlink()
 
         if mode == "move":
-            shutil.move(item, target)
+            shutil.move(loc_py, target)
         else:
-            shutil.copy2(item, target)
+            shutil.copy2(loc_py, target)
 
+    # --------------------------------------------------
+    # Register pipelines in DB
+    # --------------------------------------------------
+    _register_ppls_in_db(ppls_meta)
 
-    # ---- Register pipelines ----
-    _register_ppls_in_db(meta.get("ppls", {}))
-
-    # ---- Attach transfer context (provenance only) ----
+    # --------------------------------------------------
+    # Persist per-transfer metadata
+    # --------------------------------------------------
     tm = meta.get("transfer_meta", {})
 
-    ctx = TransferContext(
-        path_map={
-            src: str(lab_base / dst)
-            for src, dst in tm.get("path_map", {}).items()
-        },
-        component_map={},   # future
-        transfer_id=meta["transfer_id"],
-    )
+    transfer_meta = {
+        "transfer_id": transfer_id,
+        "origin_lab_id": meta.get("origin_lab_id"),
+        "created_at": meta.get("created_at"),
+        "ppls": sorted(incoming_ppls),
+        "path_map": tm.get("path_map", {}),
+        "loc_map": tm.get("loc_map", {})
+    }
 
+    with open(transfer_dir / "transfer.json", "w", encoding="utf-8") as f:
+        json.dump(transfer_meta, f, indent=4)
 
-    settings["transfer_context"] = ctx
-    set_shared_data(settings)
+    # --------------------------------------------------
+    # Update global transfer_config.json
+    # --------------------------------------------------
+    for pplid in incoming_ppls:
+        ppl_to_transfer[pplid] = transfer_id
+
+    if transfer_id not in cfg["history"]:
+        cfg["history"].append(transfer_id)
+
+    cfg["active_transfer_id"] = transfer_id
+
+    _save_transfer_config(transfers_dir, cfg)
+
 
     return True
+
 # ---------------------------
 # Helper: write single .py file for locs
 # ---------------------------
 def _loc_hash(code: str) -> str:
     return hashlib.sha1(code.encode()).hexdigest()[:8]
 
-def _write_loc_payload(zf, lab_base: Path, locs: set, transfer_id: str):
-    """
-    Collect all component classes defined in locs and their imports,
-    write them into a single <transfer_id>.py file inside the zip,
-    and return mapping of full loc -> transfer_id.classhash
-    """
-    loc_map = {}
-    code_chunks = []
-    processed_modules = set()
+import ast
+import hashlib
+from pathlib import Path
+from copy import deepcopy
+
+def _write_loc_payload(zf, locs: set, transfer_id: str):
     settings = get_shared_data()
     component_dir = Path(settings["component_dir"]).resolve()
-    for loc in sorted(locs):
-        if '.' not in loc:
-            continue
-        module_name, class_name = loc.rsplit('.', 1)
 
-        module_path = component_dir / f"{module_name}.py"
+    loc_map = {}
+    code_chunks = []
+
+    # Step 1: collect all classes across LOCs
+    class_defs = {}  # loc -> (class_name, ast.ClassDef)
+    for loc in sorted(locs):
+        if "." not in loc:
+            continue
+
+        module_path_str, class_name = loc.rsplit(".", 1)
+        module_path = (component_dir / Path(*module_path_str.split("."))).with_suffix(".py")
+
         if not module_path.exists():
             print(f"Warning: component file not found: {module_path}")
             continue
 
-        # Skip module if already processed
-        if module_path in processed_modules:
-            continue
-        processed_modules.add(module_path)
+        code_text = module_path.read_text(encoding="utf-8")
+        tree = ast.parse(code_text)
 
-        code_text = module_path.read_text(encoding='utf-8')
-
-        # Extract imports (lines starting with import or from)
+        target_class = None
         imports = []
-        classes = {}
-        for line in code_text.splitlines():
-            stripped = line.strip()
-            if stripped.startswith("import ") or stripped.startswith("from "):
-                imports.append(line)
 
-        # Extract class definitions (simple regex for top-level classes)
-        import re
-        class_pattern = re.compile(r"^class\s+(\w+)[\(:]", re.MULTILINE)
-        for match in class_pattern.finditer(code_text):
-            cls_name = match.group(1)
-            # get class source by splitting lines
-            lines = code_text.splitlines()
-            start = match.start()
-            # crude: take all lines from match to end or next class
-            next_class_match = class_pattern.search(code_text, pos=match.end())
-            end = next_class_match.start() if next_class_match else len(code_text)
-            class_code = code_text[match.start():end].strip()
-            classes[cls_name] = class_code
+        for node in tree.body:
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                imports.append(node)
+            elif isinstance(node, ast.ClassDef) and node.name == class_name:
+                target_class = node
 
-        # pick only classes referenced in locs from this module
-        if class_name not in classes:
-            print(f"Warning: class {class_name} not found in {module_path}")
+        if target_class is None:
+            print(f"Warning: class '{class_name}' not found in {module_path}")
             continue
 
-        # include imports + class code
-        final_code = '\n'.join(imports + [''] + [classes[class_name]])
-        class_hash = hashlib.sha1(final_code.encode()).hexdigest()[:8]
-        loc_map[loc] = f"{transfer_id}.{class_hash}"
-        code_chunks.append(f"# --- {loc} ---\n{final_code}\n")
+        class_defs[loc] = (class_name, deepcopy(target_class), imports)
 
-    # Write single .py inside zip
+    if not class_defs:
+        raise RuntimeError("No classes found for the provided LOCs")
+
+    # Step 2: compute unique names for all classes
+    old_to_new = {}
+    for loc, (class_name, class_node, _) in class_defs.items():
+        loc_hash = hashlib.sha1(loc.encode("utf-8")).hexdigest()[:8]
+        new_name = f"{class_name}{loc_hash}"
+        old_to_new[class_name] = new_name
+        loc_map[loc] = f"{transfer_id}.{new_name}"
+
+    # Step 3: rewrite ASTs with renamed classes and updated bases
+    final_code_chunks = []
+    all_imports = set()
+
+    for loc, (class_name, class_node, imports) in class_defs.items():
+        # Rename class
+        class_node.name = old_to_new[class_name]
+
+        # Replace base classes if they exist in old_to_new
+        new_bases = []
+        for base in class_node.bases:
+            if isinstance(base, ast.Name) and base.id in old_to_new:
+                new_bases.append(ast.Name(id=old_to_new[base.id], ctx=ast.Load()))
+            else:
+                new_bases.append(base)
+        class_node.bases = new_bases
+
+        # Collect imports
+        for imp in imports:
+            all_imports.add(ast.unparse(imp))
+
+        # Build final module chunk for this class
+        module_chunk = ast.Module(body=[class_node], type_ignores=[])
+        ast.fix_missing_locations(module_chunk)
+        class_code = ast.unparse(module_chunk)
+
+        final_code_chunks.append(f"# --- {loc} ---\n{class_code}\n")
+
+    # Combine imports + class chunks
+    imports_code = "\n".join(sorted(all_imports))
+    py_code = f"{imports_code}\n\n" + "\n\n".join(final_code_chunks)
+
+    # Write single .py file to zip
     py_name = f"{transfer_id}.py"
-    zf.writestr(py_name, '\n\n'.join(code_chunks))
-    return loc_map
+    zf.writestr(py_name, py_code)
 
+    return loc_map
 
 # ---------------------------
 # Internal: import on base
 # ---------------------------
+
 def _import_on_base(zip_path, meta):
     settings = get_shared_data()
     results_dir = Path(settings["data_path"]) / "RemoteResults" / meta["transfer_id"]
     _safe_extract(zip_path, results_dir)
+
+    # Optionally register empty transfer_context for consistency
+    ctx = TransferContext(path_map={}, component_map={}, transfer_id=meta["transfer_id"])
+    settings["transfer_context"] = ctx
+    set_shared_data(settings)
 
 
 def _register_ppls_in_db(ppls_meta: dict):
@@ -521,6 +646,22 @@ def _collect_ppls_meta(ppls):
         }
 
     return meta
+
+def register_transfer_mapping(ppls_meta: dict, transfer_id: str, loc_map: dict):
+    """
+    Register pplid -> transfer info and loc_map in shared data
+    """
+    settings = get_shared_data()
+    registry = settings.get("transfer_registry", {})
+
+    for pplid in ppls_meta:
+        registry[pplid] = {
+            "transfer_id": transfer_id,
+            "loc_map": loc_map
+        }
+
+    settings["transfer_registry"] = registry
+    set_shared_data(settings)
 
 
 import json
@@ -584,3 +725,5 @@ def get_clones():
         df = df.sort_values("created_at").reset_index(drop=True)
 
     return df
+
+
