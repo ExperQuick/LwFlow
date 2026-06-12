@@ -207,6 +207,26 @@ The `plf.experiment` module provides powerful tools for managing your PPL databa
 
 ---
 
+## 🖥 CLI Usage (`plf`)
+
+After installing PyLabFlow, the `plf` command is available in your terminal.
+
+```bash
+plf --help                             # list all commands
+plf status                             # show PPL status table
+plf list                               # list active PPL IDs
+plf run <pplid>                        # run a pipeline
+plf archive <pplid>                    # archive a pipeline
+plf delete <pplid>                     # delete from archive
+plf stop                               # gracefully stop running pipeline(s)
+plf export <pplid> --format yaml       # export config (yaml or json)
+plf init --config settings.json        # initialize lab from config file
+```
+
+The CLI auto-detects your lab by walking up from the current directory looking for `settings.json`, similar to how `git` finds `.git/`. You can also pass `--settings <path>` explicitly.
+
+---
+
 ## 📜 License
 
 This project is licensed under the **Apache License 2.0**.  © 2025 BBEK Anand
