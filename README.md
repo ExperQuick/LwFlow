@@ -205,7 +205,22 @@ The `plf.experiment` module provides powerful tools for managing your PPL databa
 * **`delete_ppl(ppls)`**: Permanently deletes a pipeline from the archive.
 * **`stop_running()`**: Gracefully stops a currently running pipeline after its current iteration completes.
 
----
+### Pipeline Configuration Export Utilities
+
+You can export pipeline (PPL) configurations from the internal database into standard JSON or YAML formats for version control or inspection.
+
+```python
+from plf.experiment import export_ppl_to_yaml, export_ppl_to_json
+
+# Export a single pipeline config to YAML
+export_ppl_to_yaml("ppl_data_run_001", output_path="./configs/ppl_data_run_001.yaml")
+
+# Export a single pipeline config to JSON
+export_ppl_to_json("ppl_data_run_001", output_path="./configs/ppl_data_run_001.json")
+
+# Export all active pipelines at once using a wildcard
+export_ppl_to_yaml("*", output_dir="./configs/")
+
 
 ## 🖥 CLI Usage (`plf`)
 

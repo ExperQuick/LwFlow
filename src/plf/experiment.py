@@ -23,9 +23,10 @@ __all__ = [
     "delete_ppl",
     "transfer_ppl",
     "group_by_common_columns",
-    'filter_ppls'
+    'filter_ppls',
+    "export_ppl_to_json",
+    "export_ppl_to_yaml"
 ]
-
 
 def get_ppls() -> List[str]:
     """
@@ -481,3 +482,113 @@ def group_by_common_columns(
     for k, colset in cols.items():
         group_map[colset].append(k)
     return group_map
+
+def _get_ppl_data(pplid: str) -> dict:
+    """Helper function to fetch and format pipeline data from the SQLite database."""
+    db = Db(db_path=f"{get_shared_data()['data_path']}/ppls.db")
+    try:
+        # Dynamically fetch column names to prevent indexing errors
+        columns_info = db.query("PRAGMA table_info(ppls)")
+        column_names = [col[1] for col in columns_info]
+        
+        rows = db.query(f"SELECT * FROM ppls WHERE pplid = '{pplid}'")
+        if not rows:
+            db.close()
+            raise ValueError(f"Pipeline with ID '{pplid}' does not exist.")
+            
+        row = rows[0]
+        db.close()
+        
+        # Map columns to values
+        data = dict(zip(column_names, row))
+        
+        # Convert internal JSON strings (like args/workflow) back into nested Python dictionaries
+        for key, value in data.items():
+            if isinstance(value, str) and (value.startswith('{') or value.startswith('[')):
+                try:
+                    data[key] = json.loads(value)
+                except Exception:
+                    pass
+        return data
+    except Exception as e:
+        if 'db' in locals():
+            db.close()
+        raise e
+
+def _get_all_ppl_data() -> list:
+    """Helper function to fetch all pipelines for wildcard exports."""
+    db = Db(db_path=f"{get_shared_data()['data_path']}/ppls.db")
+    columns_info = db.query("PRAGMA table_info(ppls)")
+    column_names = [col[1] for col in columns_info]
+    
+    rows = db.query("SELECT * FROM ppls")
+    db.close()
+    
+    all_data = []
+    for row in rows:
+        data = dict(zip(column_names, row))
+        for key, value in data.items():
+            if isinstance(value, str) and (value.startswith('{') or value.startswith('[')):
+                try:
+                    data[key] = json.loads(value)
+                except Exception:
+                    pass
+        all_data.append(data)
+    return all_data
+
+def export_ppl_to_json(pplid: str, output_path: Optional[str] = None, output_dir: Optional[str] = None) -> str:
+    """Exports pipeline configuration(s) to JSON format."""
+    if pplid == "*":
+        if not output_dir:
+            raise ValueError("output_dir must be provided when using wildcard '*'")
+        os.makedirs(output_dir, exist_ok=True)
+        all_ppls = _get_all_ppl_data()
+        for ppl in all_ppls:
+            p_id = ppl.get("pplid", "unknown")
+            path = os.path.join(output_dir, f"{p_id}.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(ppl, f, indent=4)
+        return output_dir
+    else:
+        data = _get_ppl_data(pplid)
+        if not output_path:
+            output_path = os.path.join(output_dir, f"{pplid}.json") if output_dir else f"./{pplid}.json"
+            
+        dirname = os.path.dirname(output_path)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
+            
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+        return output_path
+
+def export_ppl_to_yaml(pplid: str, output_path: Optional[str] = None, output_dir: Optional[str] = None) -> str:
+    """Exports pipeline configuration(s) to YAML format."""
+    try:
+        import yaml
+    except ImportError:
+        raise ImportError("The 'pyyaml' package is required for YAML export. Please install it using 'pip install pyyaml'.")
+        
+    if pplid == "*":
+        if not output_dir:
+            raise ValueError("output_dir must be provided when using wildcard '*'")
+        os.makedirs(output_dir, exist_ok=True)
+        all_ppls = _get_all_ppl_data()
+        for ppl in all_ppls:
+            p_id = ppl.get("pplid", "unknown")
+            path = os.path.join(output_dir, f"{p_id}.yaml")
+            with open(path, f"w", encoding="utf-8") as f:
+                yaml.dump(ppl, f, default_flow_style=False)
+        return output_dir
+    else:
+        data = _get_ppl_data(pplid)
+        if not output_path:
+            output_path = os.path.join(output_dir, f"{pplid}.yaml") if output_dir else f"./{pplid}.yaml"
+            
+        dirname = os.path.dirname(output_path)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
+            
+        with open(output_path, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, default_flow_style=False)
+        return output_path
