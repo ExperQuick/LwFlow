@@ -35,8 +35,14 @@ setup(
     packages=find_packages(where='src'),
     include_package_data=True,
     install_requires=[
-        'pandas'
+        'pandas',
+        'click'
     ],
+    entry_points={
+        'console_scripts': [
+            'plf = plf.cli:main',
+        ],
+    },
     author='BBEK-Anand',
     author_email='',
     description='PyLabFlow is a lightweight framework that simplifies experiment management, reducing setup time with reusable components for training, logging, and checkpointing. It streamlines workflows, making it ideal for fast and efficient experimentation.',
