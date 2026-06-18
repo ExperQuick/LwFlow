@@ -1,5 +1,6 @@
 """
 create or use our lab
+from uuid import uuid4
 """
 
 from pathlib import Path
