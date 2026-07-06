@@ -199,6 +199,8 @@ The `plf.experiment` module provides powerful tools for managing your PPL databa
 
 * **`get_ppls()`**: List all active pipeline IDs in the current Lab.
 * **`get_ppl_status()`**: Returns a DataFrame summarizing the status, last run, and key metrics for all PPLs.
+* **`compare_ppl_configs(pplid_a, pplid_b)`**: Compare two pipeline configs and return a structured diff of their `workflow` and `args` sections.
+* **`get_ppl_history(pplid)`**: Return a DataFrame of run timestamps and session origins for a single pipeline.
 * **`filter_ppls(query)`**: Filters PPLs based on configuration arguments (e.g., `filter_ppls("data_source=my_workflows.MyComponent")`).
 * **`archive_ppl(ppls)`**: Archives a pipeline, moving its configurations and artifacts to an archived folder for safe storage.
 * **`archive_ppl(ppls, reverse=True)`**: Unarchives a pipeline and returns it to the active environment.
@@ -219,6 +221,8 @@ plf run <pplid>                        # run a pipeline
 plf archive <pplid>                    # archive a pipeline
 plf delete <pplid>                     # delete from archive
 plf stop                               # gracefully stop running pipeline(s)
+plf compare <pplid1> <pplid2>          # diff two pipeline configs
+plf log <pplid>                        # show run history for a pipeline
 plf export <pplid> --format yaml       # export config (yaml or json)
 plf init --config settings.json        # initialize lab from config file
 ```

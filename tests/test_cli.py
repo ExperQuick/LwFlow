@@ -51,6 +51,68 @@ def test_status_empty(mock_status, mock_setup):
 
 
 @patch("plf.cli.lab_setup")
+@patch("plf.cli.compare_ppl_configs")
+def test_compare_identical(mock_compare, mock_setup):
+    mock_compare.return_value = {
+        "identical": True,
+        "pplid_a": "ppl_a",
+        "pplid_b": "ppl_b",
+        "differences": {},
+    }
+    result = invoke(["compare", "ppl_a", "ppl_b"])
+    assert result.exit_code == 0
+    assert "identical" in result.output
+
+
+@patch("plf.cli.lab_setup")
+@patch("plf.cli.compare_ppl_configs")
+def test_compare_differences(mock_compare, mock_setup):
+    mock_compare.return_value = {
+        "identical": False,
+        "pplid_a": "ppl_a",
+        "pplid_b": "ppl_b",
+        "differences": {
+            "args.lr": {"left": 0.01, "right": 0.001},
+        },
+    }
+    result = invoke(["compare", "ppl_a", "ppl_b"])
+    assert result.exit_code == 0
+    assert "args.lr" in result.output
+
+
+@patch("plf.cli.lab_setup")
+@patch("plf.cli.compare_ppl_configs", side_effect=ValueError("Pipeline 'x' not found"))
+def test_compare_not_found(mock_compare, mock_setup):
+    result = invoke(["compare", "ppl_a", "x"])
+    assert result.exit_code == 1
+    assert "not found" in result.output
+
+
+@patch("plf.cli.lab_setup")
+@patch("plf.cli.get_ppl_history")
+def test_log_with_history(mock_history, mock_setup):
+    mock_history.return_value = pd.DataFrame({
+        "runid": [1],
+        "pplid": ["ppl_001"],
+        "logid": ["log0"],
+        "parity": [None],
+        "started_time": ["2025-01-01 00:00:00"],
+        "called_at": ["script:test.py"],
+    })
+    result = invoke(["log", "ppl_001"])
+    assert result.exit_code == 0
+    assert "ppl_001" in result.output
+
+
+@patch("plf.cli.lab_setup")
+@patch("plf.cli.get_ppl_history", return_value=pd.DataFrame())
+def test_log_empty(mock_history, mock_setup):
+    result = invoke(["log", "ppl_001"])
+    assert result.exit_code == 0
+    assert "No run history found" in result.output
+
+
+@patch("plf.cli.lab_setup")
 @patch("plf.cli.PipeLine")
 def test_run(mock_pipeline_cls, mock_setup):
     mock_instance = MagicMock()

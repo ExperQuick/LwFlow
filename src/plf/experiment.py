@@ -2,7 +2,7 @@
 This module  have all  function  for initiating pipeline and training
 """
 
-from typing import Optional, Dict, List
+from typing import Any, Optional, Dict, List, Union
 import json
 import os
 import shutil
@@ -15,15 +15,17 @@ from ._pipeline import PipeLine, TransferContext
 
 
 __all__ = [
-    "PipeLine","TransferContext",
+    "PipeLine", "TransferContext",
     "get_ppls",
     "get_ppl_details",
     "get_ppl_status",
+    "get_ppl_history",
+    "compare_ppl_configs",
     "archive_ppl",
     "delete_ppl",
     "transfer_ppl",
     "group_by_common_columns",
-    'filter_ppls'
+    "filter_ppls",
 ]
 
 
@@ -82,6 +84,151 @@ def get_ppl_status(ppls: Optional[list] = None) -> pd.DataFrame:
         data[i] = P.status()
     df = pd.DataFrame.from_dict(data, orient='index')
     return df
+
+
+def _extract_comparable_config(cnfg: Dict[str, Any]) -> Dict[str, Any]:
+    """Return the parts of a config that define reproducibility (used for hashing).
+
+    Args:
+        cnfg: Full pipeline configuration dictionary loaded from disk.
+
+    Returns:
+        A dictionary containing only ``workflow`` and ``args`` keys.
+    """
+    return {
+        "workflow": cnfg.get("workflow"),
+        "args": cnfg.get("args"),
+    }
+
+
+def _config_diff(
+    left: Dict[str, Any],
+    right: Dict[str, Any],
+    path: str = "",
+) -> Dict[str, Dict[str, Any]]:
+    """Recursively compare two config dictionaries and collect differences.
+
+    Args:
+        left: Configuration from the first pipeline.
+        right: Configuration from the second pipeline.
+        path: Dot-separated key path used during recursion (internal).
+
+    Returns:
+        Mapping of dotted key paths to ``{"left": ..., "right": ...}`` entries.
+    """
+    differences: Dict[str, Dict[str, Any]] = {}
+    all_keys = set(left.keys()) | set(right.keys())
+
+    for key in sorted(all_keys):
+        current_path = f"{path}.{key}" if path else key
+
+        if key not in left:
+            differences[current_path] = {"left": None, "right": right[key]}
+            continue
+        if key not in right:
+            differences[current_path] = {"left": left[key], "right": None}
+            continue
+
+        left_val = left[key]
+        right_val = right[key]
+
+        # Recurse into nested dicts (e.g. workflow.args, component configs).
+        if isinstance(left_val, dict) and isinstance(right_val, dict):
+            differences.update(_config_diff(left_val, right_val, current_path))
+        elif left_val != right_val:
+            differences[current_path] = {"left": left_val, "right": right_val}
+
+    return differences
+
+
+def compare_ppl_configs(pplid_a: str, pplid_b: str) -> Dict[str, Any]:
+    """Compare reproducibility-relevant settings of two pipelines.
+
+    Loads both pipeline configs and diffs their ``workflow`` and ``args``
+    sections — the same fields used when computing the config hash.
+
+    Args:
+        pplid_a: ID of the first pipeline.
+        pplid_b: ID of the second pipeline.
+
+    Returns:
+        A result dictionary with keys:
+
+        - ``identical`` (bool): True when no differences were found.
+        - ``pplid_a`` / ``pplid_b`` (str): The compared pipeline IDs.
+        - ``differences`` (dict): Dotted-path diffs, each with ``left`` and
+          ``right`` values (``None`` when a key exists in only one config).
+
+    Raises:
+        ValueError: If either pipeline ID is not found in the active lab.
+    """
+    pipeline_a = PipeLine()
+    if not pipeline_a.verify(pplid=pplid_a):
+        raise ValueError(f"Pipeline '{pplid_a}' not found")
+    pipeline_a.load(pplid=pplid_a)
+
+    pipeline_b = PipeLine()
+    if not pipeline_b.verify(pplid=pplid_b):
+        raise ValueError(f"Pipeline '{pplid_b}' not found")
+    pipeline_b.load(pplid=pplid_b)
+
+    comparable_a = _extract_comparable_config(pipeline_a.cnfg)
+    comparable_b = _extract_comparable_config(pipeline_b.cnfg)
+    differences = _config_diff(comparable_a, comparable_b)
+
+    return {
+        "identical": len(differences) == 0,
+        "pplid_a": pplid_a,
+        "pplid_b": pplid_b,
+        "differences": differences,
+    }
+
+
+def get_ppl_history(pplid: str) -> pd.DataFrame:
+    """Return the run history for a single pipeline.
+
+    Queries the ``runnings`` table in ``ppls.db`` and enriches each row with
+    session origin information from ``logs.db`` (via ``logid``).
+
+    Args:
+        pplid: Pipeline ID to look up.
+
+    Returns:
+        A DataFrame with columns ``runid``, ``pplid``, ``logid``, ``parity``,
+        ``started_time``, and ``called_at``. Empty when the pipeline has never
+        been executed.
+
+    Raises:
+        ValueError: If the pipeline ID is not found in the active lab.
+    """
+    data_path = os.path.abspath(get_shared_data()["data_path"])
+
+    pipeline = PipeLine()
+    if not pipeline.verify(pplid=pplid):
+        raise ValueError(f"Pipeline '{pplid}' not found")
+
+    ppls_db = Db(db_path=os.path.join(data_path, "ppls.db"))
+    rows = ppls_db.query(
+        "SELECT runid, pplid, logid, parity, started_time "
+        "FROM runnings WHERE pplid = ? ORDER BY started_time",
+        (pplid,),
+    )
+    ppls_db.close()
+
+    columns = ["runid", "pplid", "logid", "parity", "started_time"]
+    if not rows:
+        return pd.DataFrame(columns=columns + ["called_at"])
+
+    history = pd.DataFrame(rows, columns=columns)
+
+    # Join session metadata from logs.db (separate SQLite file).
+    logs_db = Db(db_path=os.path.join(data_path, "logs.db"))
+    log_rows = logs_db.query("SELECT logid, called_at FROM logs")
+    logs_db.close()
+    log_map = {logid: called_at for logid, called_at in log_rows}
+    history["called_at"] = history["logid"].map(log_map)
+
+    return history
 
 def multi_run(ppls: Dict[str, int], last_epoch: int = 10, patience: int = 5) -> None:
     """
