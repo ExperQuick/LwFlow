@@ -15,7 +15,9 @@ from plf.lab import create_project, lab_setup
 from plf.experiment import (
     PipeLine,
     archive_ppl,
+    compare_ppl_configs,
     delete_ppl,
+    get_ppl_history,
     get_ppl_status,
     get_ppls,
     get_runnings,
@@ -81,6 +83,49 @@ def list_ppls(ctx):
         return
     for ppl in ppls:
         click.echo(ppl)
+
+
+@main.command()
+@click.argument("pplid_a")
+@click.argument("pplid_b")
+@click.pass_context
+def compare(ctx, pplid_a, pplid_b):
+    """Compare configs of two pipelines and show differences."""
+    _load_lab(ctx.obj["settings"])
+    try:
+        result = compare_ppl_configs(pplid_a, pplid_b)
+    except ValueError as exc:
+        click.echo(f"Error: {exc}", err=True)
+        sys.exit(1)
+
+    if result["identical"]:
+        click.echo(f"Configs for '{pplid_a}' and '{pplid_b}' are identical.")
+        return
+
+    click.echo(f"Differences between '{pplid_a}' and '{pplid_b}':")
+    for path, values in sorted(result["differences"].items()):
+        click.echo(f"  {path}:")
+        click.echo(f"    {pplid_a}: {values['left']!r}")
+        click.echo(f"    {pplid_b}: {values['right']!r}")
+
+
+@main.command(name="log")
+@click.argument("pplid")
+@click.pass_context
+def show_log(ctx, pplid):
+    """Show run history for a pipeline."""
+    _load_lab(ctx.obj["settings"])
+    try:
+        df = get_ppl_history(pplid)
+    except ValueError as exc:
+        click.echo(f"Error: {exc}", err=True)
+        sys.exit(1)
+
+    if df.empty:
+        click.echo(f"No run history found for '{pplid}'.")
+        return
+
+    click.echo(df.to_string(index=False))
 
 
 @main.command()
